@@ -3,8 +3,8 @@ import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from page_objects.base_page import BasePage
-from page_objects.element import Element
+from src.page_object.base.base_page import BasePage
+from src.page_object.base.element import Element
 
 
 class ReceiptModal(BasePage):

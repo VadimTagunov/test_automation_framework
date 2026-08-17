@@ -1,9 +1,9 @@
 """API-only fixtures: one client per resource."""
 import pytest
 
-from api.balance_client import BalanceClient
-from api.bets_client import BetsClient
-from api.matches_client import MatchesClient
+from src.api.balance_client import BalanceClient
+from src.api.bets_client import BetsClient
+from src.api.matches_client import MatchesClient
 from config.config import Config
 
 

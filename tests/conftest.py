@@ -1,7 +1,7 @@
 """Root-level fixtures shared across the UI and API test suites."""
 import pytest
 
-from api.balance_client import BalanceClient
+from src.api.balance_client import BalanceClient
 from config.config import Config
 
 

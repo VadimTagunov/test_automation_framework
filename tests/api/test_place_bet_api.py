@@ -2,8 +2,8 @@
 import allure
 import pytest
 
-from api.bets_client import BetsClient
-from api.matches_client import MatchesClient
+from src.api.bets_client import BetsClient
+from src.api.matches_client import MatchesClient
 
 BELOW_MIN_STAKE = 0.50
 SELECTION = "HOME"
