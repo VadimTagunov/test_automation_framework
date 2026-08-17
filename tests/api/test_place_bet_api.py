@@ -24,15 +24,12 @@ def test_place_bet_rejects_stake_below_minimum(
     faster and more reliable than driving the same rule through the UI,
     which would add browser overhead without covering the rule any better.
     """
-    with allure.step("Fetch a valid match id to bet on"):
-        matches_response = matches_client.get_matches()
-        assert matches_response.status_code == 200
-        match_id = matches_response.json()[0]["id"]
+    matches_response = matches_client.get_matches()
+    assert matches_response.status_code == 200
+    match_id = matches_response.json()[0]["id"]
 
-    with allure.step(f"Place a bet with a stake below the minimum ({BELOW_MIN_STAKE})"):
-        response = bets_client.place_bet(match_id, SELECTION, BELOW_MIN_STAKE)
+    response = bets_client.place_bet(match_id, SELECTION, BELOW_MIN_STAKE)
 
-    with allure.step("Verify the API rejects it with 422 invalid_stake_min"):
-        assert response.status_code == 422
-        body = response.json()
-        assert body["error"] == "invalid_stake_min"
+    assert response.status_code == 422
+    body = response.json()
+    assert body["error"] == "invalid_stake_min"

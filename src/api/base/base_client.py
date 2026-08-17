@@ -1,8 +1,10 @@
 """Shared HTTP request logic for all API clients."""
 from __future__ import annotations
 
+import json
 from typing import Any
 
+import allure
 import requests
 
 
@@ -28,14 +30,36 @@ class BaseClient:
     def _url(self, path: str) -> str:
         return f"{self.base_url}/{path.lstrip('/')}"
 
+    def _request(self, method: str, path: str, **kwargs: Any) -> requests.Response:
+        url = self._url(path)
+        request_body = kwargs.get("json")
+
+        with allure.step(f"Request: {method} {url}"):
+            if request_body is not None:
+                allure.attach(
+                    json.dumps(request_body),
+                    name="Request body",
+                    attachment_type=allure.attachment_type.JSON,
+                )
+            response = self.session.request(method, url, timeout=self.timeout, **kwargs)
+
+        with allure.step(f"Response: {response.status_code}"):
+            allure.attach(
+                response.text,
+                name="Response body",
+                attachment_type=allure.attachment_type.JSON,
+            )
+
+        return response
+
     def get(self, path: str, **kwargs: Any) -> requests.Response:
-        return self.session.get(self._url(path), timeout=self.timeout, **kwargs)
+        return self._request("GET", path, **kwargs)
 
     def post(self, path: str, json: dict | None = None, **kwargs: Any) -> requests.Response:
-        return self.session.post(self._url(path), json=json, timeout=self.timeout, **kwargs)
+        return self._request("POST", path, json=json, **kwargs)
 
     def put(self, path: str, json: dict | None = None, **kwargs: Any) -> requests.Response:
-        return self.session.put(self._url(path), json=json, timeout=self.timeout, **kwargs)
+        return self._request("PUT", path, json=json, **kwargs)
 
     def delete(self, path: str, **kwargs: Any) -> requests.Response:
-        return self.session.delete(self._url(path), timeout=self.timeout, **kwargs)
+        return self._request("DELETE", path, **kwargs)
