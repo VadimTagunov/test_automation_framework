@@ -1,10 +1,11 @@
-"""Page object for the upcoming-matches list."""
+"""Пейдж-обджект списка предстоящих матчей."""
 from dataclasses import dataclass
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webdriver import WebDriver
 
 from page_objects.base_page import BasePage
+from page_objects.element import Element
 
 
 @dataclass(frozen=True)
@@ -15,15 +16,17 @@ class MatchSummary:
 
 
 class MatchListPage(BasePage):
-    LOADING_SPINNER = (By.ID, "match-list-loading")
-    MATCH_CARDS = (By.CSS_SELECTOR, ".matchCard")
+    def __init__(self, driver: WebDriver) -> None:
+        super().__init__(driver)
+        self.loading_spinner = Element(By.ID, "match-list-loading")
+        self.match_cards = Element(By.CSS_SELECTOR, ".matchCard")
 
     def wait_for_matches_to_load(self) -> None:
-        self.wait.until(EC.invisibility_of_element_located(self.LOADING_SPINNER))
-        self.wait.until(EC.presence_of_element_located(self.MATCH_CARDS))
+        self.loading_spinner.wait_until_invisible()
+        self.match_cards.find()
 
     def get_first_match(self) -> MatchSummary:
-        card = self.find_all(self.MATCH_CARDS)[0]
+        card = self.match_cards.find_all()[0]
         match_id = card.get_attribute("id").removeprefix("match-card-")
         team_names = card.find_elements(By.CSS_SELECTOR, ".teamName")
         return MatchSummary(
@@ -33,8 +36,11 @@ class MatchListPage(BasePage):
         )
 
     def get_odds_value(self, match_id: str, selection: str) -> float:
-        locator = (By.CSS_SELECTOR, f"#odds-{match_id}-{selection.lower()} .oddsButtonValue")
-        return float(self.find(locator).text)
+        odds_value = Element(
+            By.CSS_SELECTOR, f"#odds-{match_id}-{selection.lower()} .oddsButtonValue"
+        )
+        return float(odds_value.get_text())
 
     def select_outcome(self, match_id: str, selection: str) -> None:
-        self.click((By.ID, f"odds-{match_id}-{selection.lower()}"))
+        outcome_button = Element(By.ID, f"odds-{match_id}-{selection.lower()}")
+        outcome_button.click()

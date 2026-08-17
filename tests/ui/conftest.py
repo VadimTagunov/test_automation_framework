@@ -8,11 +8,16 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 from app.app import App
 from config.config import Config
+from driver.manager import DriverManager
 
 
 @pytest.fixture
 def driver() -> Generator[WebDriver, None, None]:
-    """Chrome driver via Selenium Manager (built into Selenium 4.6+)."""
+    """Chrome driver via Selenium Manager (built into Selenium 4.6+).
+
+    Registers the driver in DriverManager for the current thread so that
+    page-object Elements can pick it up without having it passed to them.
+    """
     options = Options()
     if Config.HEADLESS:
         options.add_argument("--headless=new")
@@ -21,7 +26,9 @@ def driver() -> Generator[WebDriver, None, None]:
 
     chrome_driver = webdriver.Chrome(options=options)
     chrome_driver.set_page_load_timeout(Config.PAGE_LOAD_TIMEOUT)
+    DriverManager.set_driver(chrome_driver)
     yield chrome_driver
+    DriverManager.clear_driver()
     chrome_driver.quit()
 
 
