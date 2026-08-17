@@ -1,6 +1,7 @@
 """UI-only fixtures: webdriver lifecycle and the `app` fixture."""
 from collections.abc import Generator
 
+import allure
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -18,24 +19,30 @@ def driver() -> Generator[WebDriver, None, None]:
     Registers the driver in DriverManager for the current thread so that
     page-object Elements can pick it up without having it passed to them.
     """
-    options = Options()
-    if Config.HEADLESS:
-        options.add_argument("--headless=new")
-    options.add_argument(f"--window-size={Config.WINDOW_SIZE}")
-    options.add_argument("--disable-gpu")
+    with allure.step(f"Запустить Chrome-драйвер (headless={Config.HEADLESS})"):
+        options = Options()
+        if Config.HEADLESS:
+            options.add_argument("--headless=new")
+        options.add_argument(f"--window-size={Config.WINDOW_SIZE}")
+        options.add_argument("--disable-gpu")
 
-    chrome_driver = webdriver.Chrome(options=options)
-    chrome_driver.set_page_load_timeout(Config.PAGE_LOAD_TIMEOUT)
-    DriverManager.set_driver(chrome_driver)
+        chrome_driver = webdriver.Chrome(options=options)
+        chrome_driver.set_page_load_timeout(Config.PAGE_LOAD_TIMEOUT)
+        DriverManager.set_driver(chrome_driver)
+
     yield chrome_driver
-    DriverManager.clear_driver()
-    chrome_driver.quit()
+
+    with allure.step("Завершить работу Chrome-драйвера"):
+        DriverManager.clear_driver()
+        chrome_driver.quit()
 
 
 @pytest.fixture
 def app(driver: WebDriver) -> Generator[App, None, None]:
     """Navigate to the app (with the required user-id param) and build App."""
-    driver.get(Config.ui_url())
-    application = App(driver)
-    application.match_list.wait_for_matches_to_load()
+    with allure.step(f"Открыть приложение по адресу {Config.ui_url()}"):
+        driver.get(Config.ui_url())
+        application = App(driver)
+        application.match_list.wait_for_matches_to_load()
+
     yield application

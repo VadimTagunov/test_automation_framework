@@ -1,6 +1,7 @@
 """Пейдж-обджект списка предстоящих матчей."""
 from dataclasses import dataclass
 
+import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
@@ -21,10 +22,12 @@ class MatchListPage(BasePage):
         self.loading_spinner = Element(By.ID, "match-list-loading")
         self.match_cards = Element(By.CSS_SELECTOR, ".matchCard")
 
+    @allure.step("Дождаться загрузки списка матчей")
     def wait_for_matches_to_load(self) -> None:
         self.loading_spinner.wait_until_invisible()
         self.match_cards.find()
 
+    @allure.step("Получить первый матч из списка")
     def get_first_match(self) -> MatchSummary:
         card = self.match_cards.find_all()[0]
         match_id = card.get_attribute("id").removeprefix("match-card-")
@@ -35,12 +38,14 @@ class MatchListPage(BasePage):
             away_team=team_names[1].text,
         )
 
+    @allure.step("Получить коэффициент на исход {selection} для матча {match_id}")
     def get_odds_value(self, match_id: str, selection: str) -> float:
         odds_value = Element(
             By.CSS_SELECTOR, f"#odds-{match_id}-{selection.lower()} .oddsButtonValue"
         )
         return float(odds_value.get_text())
 
+    @allure.step("Выбрать исход {selection} для матча {match_id}")
     def select_outcome(self, match_id: str, selection: str) -> None:
         outcome_button = Element(By.ID, f"odds-{match_id}-{selection.lower()}")
         outcome_button.click()
