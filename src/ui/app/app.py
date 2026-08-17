@@ -1,9 +1,9 @@
 """App entity: instantiates and exposes all page objects together."""
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from src.page_object.bet_slip_page import BetSlipPage
-from src.page_object.match_list_page import MatchListPage
-from src.page_object.receipt_modal import ReceiptModal
+from src.ui.page_object.bet_slip_page import BetSlipPage
+from src.ui.page_object.match_list_page import MatchListPage
+from src.ui.page_object.receipt_modal import ReceiptModal
 
 
 class App:

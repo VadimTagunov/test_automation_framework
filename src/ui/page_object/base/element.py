@@ -15,7 +15,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from config.config import Config
-from driver.manager import DriverManager
+from src.ui.driver.manager import DriverManager
 
 
 class Element:

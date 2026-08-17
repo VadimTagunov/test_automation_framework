@@ -7,9 +7,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from app.app import App
 from config.config import Config
-from driver.manager import DriverManager
+from src.ui.app.app import App
+from src.ui.driver.manager import DriverManager
 
 
 @pytest.fixture

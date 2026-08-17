@@ -4,7 +4,7 @@ import re
 import allure
 import pytest
 
-from app.app import App
+from src.ui.app.app import App
 
 VALID_STAKE = 10.00
 BET_ID_PATTERN = re.compile(r"^#B-\d+$")

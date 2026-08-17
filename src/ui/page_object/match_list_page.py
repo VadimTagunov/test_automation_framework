@@ -5,8 +5,8 @@ import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from src.page_object.base.base_page import BasePage
-from src.page_object.base.element import Element
+from src.ui.page_object.base.base_page import BasePage
+from src.ui.page_object.base.element import Element
 
 
 @dataclass(frozen=True)
