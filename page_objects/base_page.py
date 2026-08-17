@@ -1,16 +1,16 @@
-"""Общая инфраструктура для пейдж-обджектов."""
+"""Shared infrastructure for page objects."""
 from selenium.webdriver.remote.webdriver import WebDriver
 
 
 class BasePage:
-    """Базовый класс для пейдж-обджектов и их компонентов.
+    """Base class for page objects and their components.
 
-    Каждый пейдж-обджект принимает driver в конструкторе и описывает
-    элементы и поведение только своей страницы/компонента -- без
-    кросс-страничной логики. Сам driver обычным страницам не нужен
-    (элементы получают его через DriverManager), но хранится здесь на
-    случай, если конкретной странице понадобится действие уровня драйвера
-    (навигация, JS, переключение окон и т.п.).
+    Each page object takes a driver in its constructor and describes
+    elements and behavior for its own page/component only -- no
+    cross-page logic. Pages don't normally need the driver directly
+    (elements get it through DriverManager), but it's kept here in case a
+    specific page needs a driver-level action (navigation, JS, switching
+    windows, etc.).
     """
 
     def __init__(self, driver: WebDriver) -> None:

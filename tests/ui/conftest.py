@@ -19,7 +19,7 @@ def driver() -> Generator[WebDriver, None, None]:
     Registers the driver in DriverManager for the current thread so that
     page-object Elements can pick it up without having it passed to them.
     """
-    with allure.step(f"Запустить Chrome-драйвер (headless={Config.HEADLESS})"):
+    with allure.step(f"Launch Chrome driver (headless={Config.HEADLESS})"):
         options = Options()
         if Config.HEADLESS:
             options.add_argument("--headless=new")
@@ -32,7 +32,7 @@ def driver() -> Generator[WebDriver, None, None]:
 
     yield chrome_driver
 
-    with allure.step("Завершить работу Chrome-драйвера"):
+    with allure.step("Shut down the Chrome driver"):
         DriverManager.clear_driver()
         chrome_driver.quit()
 
@@ -40,7 +40,7 @@ def driver() -> Generator[WebDriver, None, None]:
 @pytest.fixture
 def app(driver: WebDriver) -> Generator[App, None, None]:
     """Navigate to the app (with the required user-id param) and build App."""
-    with allure.step(f"Открыть приложение по адресу {Config.ui_url()}"):
+    with allure.step(f"Open the app at {Config.ui_url()}"):
         driver.get(Config.ui_url())
         application = App(driver)
         application.match_list.wait_for_matches_to_load()

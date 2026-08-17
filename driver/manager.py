@@ -1,9 +1,9 @@
-"""Потокобезопасное хранилище активного WebDriver.
+"""Thread-safe registry for the active WebDriver.
 
-Element не получает driver явно при создании -- он берёт его отсюда. Хранилище
-построено на threading.local, поэтому при параллельном запуске тестов в
-разных потоках каждый поток видит только свой собственный драйвер, а не
-драйвер соседнего теста.
+Element does not receive a driver explicitly when created -- it fetches it
+from here. The registry is built on threading.local, so when tests run in
+parallel across multiple threads, each thread only ever sees its own
+driver, not a neighboring test's.
 """
 from __future__ import annotations
 

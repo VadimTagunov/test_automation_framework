@@ -1,4 +1,4 @@
-"""Пейдж-обджект модального окна с чеком после успешной ставки."""
+"""Page object for the post-bet success receipt modal."""
 import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -18,30 +18,30 @@ class ReceiptModal(BasePage):
         self.payout = Element(By.ID, "modal-success-payout")
         self.close_button = Element(By.ID, "modal-success-close")
 
-    @allure.step("Дождаться появления модального окна с чеком")
+    @allure.step("Wait for the success receipt modal to appear")
     def wait_until_visible(self) -> None:
         self.root.wait_until_visible()
 
-    @allure.step("Получить ID ставки из чека")
+    @allure.step("Get the bet id from the receipt")
     def get_bet_id(self) -> str:
         return self.bet_id.get_text()
 
-    @allure.step("Получить название матча из чека")
+    @allure.step("Get the match label from the receipt")
     def get_match_label(self) -> str:
         return self.match_label.get_text()
 
-    @allure.step("Получить сумму ставки из чека")
+    @allure.step("Get the stake amount from the receipt")
     def get_stake_text(self) -> str:
         return self.stake.get_text()
 
-    @allure.step("Получить коэффициент из чека")
+    @allure.step("Get the odds from the receipt")
     def get_odds_text(self) -> str:
         return self.odds.get_text()
 
-    @allure.step("Получить потенциальную выплату из чека")
+    @allure.step("Get the potential payout from the receipt")
     def get_payout_text(self) -> str:
         return self.payout.get_text()
 
-    @allure.step("Закрыть модальное окно с чеком")
+    @allure.step("Close the receipt modal")
     def close(self) -> None:
         self.close_button.click()

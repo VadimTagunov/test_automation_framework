@@ -1,11 +1,11 @@
-"""Обёртка над веб-элементом.
+"""Wrapper around a web element.
 
-Хранит только стратегию поиска (id, css, xpath, ...) и значение локатора --
-драйвер в конструктор не передаётся, а лениво берётся из DriverManager при
-каждом обращении. Инкапсулирует всю логику взаимодействия с элементом:
-клик, ввод текста, чтение текста и атрибутов, ожидания видимости. Элемент
-ищется заново при каждом обращении, а не кэшируется, чтобы не ловить
-StaleElementReference после ре-рендеров React.
+Holds only the search strategy (id, css, xpath, ...) and the locator value
+-- the driver is not passed into the constructor, it is lazily fetched from
+DriverManager on every interaction. Encapsulates all element interaction
+logic: click, type text, read text and attributes, visibility waits. The
+element is re-located on every call rather than cached, to avoid
+StaleElementReference after React re-renders.
 """
 from __future__ import annotations
 
