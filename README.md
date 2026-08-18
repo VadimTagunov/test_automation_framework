@@ -6,6 +6,11 @@ Test automation for the Sports Betting QA assignment app: UI (Selenium) and API 
 
 - Python 3.9+
 - Google Chrome installed locally (the UI suite drives Chrome via Selenium 4's built-in Selenium Manager, which downloads a matching chromedriver automatically -- no separate driver install needed)
+- [Homebrew](https://brew.sh) and the [Allure commandline](https://allurereport.org/docs/install/) -- only needed to view the Allure HTML report, not to run the tests themselves. The Allure commandline is a Java application, so it needs a JRE; `brew install allure` pulls one in automatically (as the `openjdk` dependency) if you don't already have one:
+
+  ```bash
+  brew install allure
+  ```
 
 ## Setup
 
@@ -53,17 +58,22 @@ Generate raw results while running tests:
 pytest --alluredir=allure-results
 ```
 
-Then generate and open the HTML report (requires the [Allure commandline](https://allurereport.org/docs/install/) -- e.g. `brew install allure` on macOS):
-
-```bash
-allure serve allure-results
-```
-
-or, to write a static report to disk instead of serving it:
+Generate the HTML report from those results:
 
 ```bash
 allure generate allure-results --output allure-report --clean
+```
+
+Then open it:
+
+```bash
 allure open allure-report
+```
+
+Or skip the generate/open split and serve it directly in one step:
+
+```bash
+allure serve allure-results
 ```
 
 ## Project structure and architecture notes
