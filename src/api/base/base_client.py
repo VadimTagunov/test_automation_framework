@@ -7,6 +7,8 @@ from typing import Any
 import allure
 import requests
 
+from src.support.step import step
+
 
 class BaseClient:
     """Holds a requests.Session with base URL and auth header wiring.
@@ -34,7 +36,7 @@ class BaseClient:
         url = self._url(path)
         request_body = kwargs.get("json")
 
-        with allure.step(f"Request: {method} {url}"):
+        with step(f"Request: {method} {url}"):
             if request_body is not None:
                 allure.attach(
                     json.dumps(request_body),
@@ -43,7 +45,7 @@ class BaseClient:
                 )
             response = self.session.request(method, url, timeout=self.timeout, **kwargs)
 
-        with allure.step(f"Response: {response.status_code}"):
+        with step(f"Response: {response.status_code}"):
             allure.attach(
                 response.text,
                 name="Response body",

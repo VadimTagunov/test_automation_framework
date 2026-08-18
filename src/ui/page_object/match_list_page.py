@@ -1,10 +1,10 @@
 """Page object for the upcoming matches list."""
 from dataclasses import dataclass
 
-import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
+from src.support.step import step
 from src.ui.page_object.base.base_page import BasePage
 from src.ui.page_object.base.element import Element
 
@@ -22,12 +22,12 @@ class MatchListPage(BasePage):
         self.loading_spinner = Element(By.ID, "match-list-loading")
         self.match_cards = Element(By.CSS_SELECTOR, ".matchCard")
 
-    @allure.step("Wait for the match list to load")
+    @step("Wait for the match list to load")
     def wait_for_matches_to_load(self) -> None:
         self.loading_spinner.wait_until_invisible()
         self.match_cards.find()
 
-    @allure.step("Get the first match from the list")
+    @step("Get the first match from the list")
     def get_first_match(self) -> MatchSummary:
         card = self.match_cards.find_all()[0]
         match_id = card.get_attribute("id").removeprefix("match-card-")
@@ -38,14 +38,14 @@ class MatchListPage(BasePage):
             away_team=team_names[1].text,
         )
 
-    @allure.step("Get the {selection} odds value for match {match_id}")
+    @step("Get the {selection} odds value for match {match_id}")
     def get_odds_value(self, match_id: str, selection: str) -> float:
         odds_value = Element(
             By.CSS_SELECTOR, f"#odds-{match_id}-{selection.lower()} .oddsButtonValue"
         )
         return float(odds_value.get_text())
 
-    @allure.step("Select the {selection} outcome for match {match_id}")
+    @step("Select the {selection} outcome for match {match_id}")
     def select_outcome(self, match_id: str, selection: str) -> None:
         outcome_button = Element(By.ID, f"odds-{match_id}-{selection.lower()}")
         outcome_button.click()
