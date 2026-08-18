@@ -2,6 +2,16 @@
 
 Test automation for the betting app: UI (Selenium) and API (requests) coverage for `pytest`.
 
+## Features
+
+- Selenium-based UI automation and `requests`-based API automation in one framework
+- Built-in Allure reporting -- every meaningful action logs an Allure step, and to stdlib `logging` at the same time, so it's visible in the console even without generating a report
+- `ui` / `api` pytest markers so either suite runs independently
+- Page Object Model with a reusable `Element` wrapper, so pages expose intent-level methods instead of raw locators scattered across tests
+- Automatic screenshot capture on UI test failure, attached straight to the Allure report
+- Thread-safe `DriverManager` for the active WebDriver, so element code stays safe if tests ever run in parallel
+- Central `Config` class reading from environment variables with sensible defaults, importable from anywhere in the codebase
+
 ## Prerequisites
 
 - Python 3.9+
@@ -21,6 +31,49 @@ pip install -r requirements.txt
 ```
 
 No `.env` file or extra config is required. `config/config.py` reads `BASE_URL`, `API_BASE_URL`, `USER_ID`, `DEFAULT_TIMEOUT`, `HEADLESS`, and `WINDOW_SIZE` from environment variables where present, falling back to defaults for this assignment (target app, `candidate-7PeYkDh0CI` user id, headless Chrome).
+
+## Project structure
+
+```
+src/
+├── api/                      # requests-based client layer, one class per resource
+│   ├── base/
+│   │   └── base_client.py    # requests.Session, base URL, x-user-id header, get/post/put/delete + request/response logging
+│   ├── matches_client.py     # GET /api/matches
+│   ├── balance_client.py     # GET /api/balance, POST /api/reset-balance
+│   └── bets_client.py        # POST /api/place-bet
+├── ui/
+│   ├── app/
+│   │   └── app.py            # App entity: aggregates all page objects for the `app` fixture
+│   ├── driver/
+│   │   └── manager.py        # DriverManager: thread-local registry of the active WebDriver
+│   └── page_object/          # classic Page Object Model
+│       ├── base/
+│       │   ├── base_page.py  # shared page-object base class
+│       │   └── element.py    # Element: locator + all interaction logic (click/type/get_text/wait/...)
+│       ├── match_list_page.py
+│       ├── bet_slip_page.py
+│       └── receipt_modal.py
+└── support/
+    └── step.py                # step: allure.step + stdlib logging combined, usable as decorator or context manager
+
+config/
+└── config.py                  # Config: BASE_URL, USER_ID, timeouts, etc. (env vars with fallback defaults)
+
+tests/
+├── conftest.py                # shared fixtures -- autouse balance reset before every test
+├── ui/
+│   ├── conftest.py            # driver/app fixtures; attaches a screenshot to Allure on failure
+│   └── test_place_bet.py      # UI E2E: successful single bet placement
+└── api/
+    ├── conftest.py            # API client fixtures
+    └── test_place_bet_api.py  # API: stake below minimum -> 422 invalid_stake_min
+
+pytest.ini                     # markers, --alluredir default, live log config
+requirements.txt
+```
+
+Only two tests are implemented, intentionally, per the assignment's scope: the single highest-value UI journey (placing a bet) and one API-level business rule (minimum stake validation) that's cheaper and more deterministic to verify below the UI. Both assert the spec-correct expected values even where known application defects would make that assertion fail, so they document real product behavior rather than working around it. `test-plan.md`, `execution-results.md`, `strategy-and-recommendations.md`, and `bugs_screenshots/` at the repo root cover the manual QA work and the reasoning behind those two automation choices.
 
 ## Running the tests
 
@@ -75,7 +128,3 @@ Or skip the generate/open split and serve it directly in one step:
 ```bash
 allure serve allure-results
 ```
-
-## Project structure and architecture notes
-
-Source code lives under `src/`, split into `src/api/` and `src/ui/`. The UI side follows a classic Page Object Model: `src/ui/page_object/` holds the pages, aggregated by a single `App` entity in `src/ui/app/app.py` that tests interact with via one `app` fixture, and `src/ui/driver/manager.py` holds `DriverManager`, the thread-local registry of the active Selenium driver. The API side is a thin client-per-resource layer (`src/api/`), each client subclassing a shared `BaseClient` that owns the `requests.Session`, base URL, and `x-user-id` header. Both sides keep their shared base class in its own `base/` subpackage (`src/api/base/base_client.py`, `src/ui/page_object/base/base_page.py`), separate from the concrete clients/pages that build on it. Each page object initializes its elements as plain instance attributes in its constructor, wrapping each locator in a small `Element` (`src/ui/page_object/base/element.py`) that owns all interaction logic (click, type, get text/attribute, wait for visibility) and re-locates on every call rather than caching a stale reference. `Element` does not take a driver in its constructor -- it fetches the active one from `DriverManager`, which the UI `driver` fixture populates, so element code stays driver-agnostic and safe if tests ever run across multiple threads in parallel. `config/config.py` is a plain class rather than a fixture so both layers -- and any script -- can import it directly. Fixtures are split by scope: `tests/conftest.py` holds what UI and API share (an autouse balance reset before each test, for deterministic stakes/balances regardless of run order), while `tests/ui/conftest.py` and `tests/api/conftest.py` own their own driver/app and client fixtures respectively. Only two tests are implemented, intentionally, per the assignment's scope: one UI E2E test for the single highest-value journey (placing a bet), and one API test for a business rule (minimum stake validation) that is cheaper and more deterministic to verify below the UI. Both tests document known application defects by asserting the spec-correct expected values rather than working around them, so they fail while those defects are present.
