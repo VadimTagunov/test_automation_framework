@@ -1,6 +1,6 @@
 # test_automation_framework
 
-Test automation for the Sports Betting QA assignment app: UI (Selenium) and API (requests) coverage for `pytest`.
+Test automation for the betting app: UI (Selenium) and API (requests) coverage for `pytest`.
 
 ## Prerequisites
 
